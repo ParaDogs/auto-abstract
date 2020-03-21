@@ -5,15 +5,18 @@ import pymorphy2
 
 args_len = len(sys.argv)
 if (args_len == 1):
-    print('autoabstract <text file name> <output file name>')
+    print('autoabstract.py <text file name> <compression percent (default: 20)> <output file name (default: autoabstract.txt)>')
     exit()
-elif (args_len == 2): OUT_FILE_NAME = 'autoabstract.txt'
-else:
-    OUT_FILE_NAME = sys.argv[2]
+if (args_len >= 2):
+    TEXT_FILE_NAME = sys.argv[1]
+    PERCENT = 20
+    OUT_FILE_NAME = 'autoabstract.txt'
+if (args_len >= 3):
+    PERCENT = int(sys.argv[2])
+if (args_len == 4):
+    OUT_FILE_NAME = sys.argv[3]   
  
 NON_INFORMATIVE_WORDS_FILE_NAME = "trash-words.txt"
-TEXT_FILE_NAME = sys.argv[1]
-PERCENT = 20
 END_SENTENCE_MARKS = ['.', '?', '!']
 PUNCTUATION_MARKS = [',', ';', '"', ':', '—', '\n', '«', '»'] + END_SENTENCE_MARKS
 MORPH = pymorphy2.MorphAnalyzer()
