@@ -1,9 +1,17 @@
+import sys
 import collections
 import functools
 
+args_len = len(sys.argv)
+if (args_len == 1):
+    print('autoabstract <text file name> <output file name>')
+    exit()
+elif (args_len == 2): OUT_FILE_NAME = 'autoabstract.txt'
+else:
+    OUT_FILE_NAME = sys.argv[2]
+ 
 NON_INFORMATIVE_WORDS_FILE_NAME = "trash-words.txt"
-TEXT_FILE_NAME = "text.txt"
-OUT_FILE_NAME = "abstract.txt"
+TEXT_FILE_NAME = sys.argv[1]
 PERCENT = 20
 END_SENTENCE_MARKS = ['.', '?', '!']
 PUNCTUATION_MARKS = [',', ';', '"', ':', '—', '\n', '«', '»'] + END_SENTENCE_MARKS
