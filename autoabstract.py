@@ -13,6 +13,9 @@ if (args_len >= 2):
     OUT_FILE_NAME = 'autoabstract.txt'
 if (args_len >= 3):
     COMPRESSION_PERCENT = int(sys.argv[2])
+    if not 1 <= COMPRESSION_PERCENT <= 99:
+        print('wrong compression percent - must be from 1 to 99')
+        exit()
 if (args_len == 4):
     OUT_FILE_NAME = sys.argv[3]   
  
@@ -25,7 +28,7 @@ class Word:
     def __init__(self, string):
         s = string.lower()
         for mark in PUNCTUATION_MARKS: s = s.replace(mark, '')
-        self.data = MORPH.parse(s)[0].normal_form # TODO слово нужно лемматизировать
+        self.data = MORPH.parse(s)[0].normal_form
     
     # получить список синонимов слова
     def get_synonyms(self):
