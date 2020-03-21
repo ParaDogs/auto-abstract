@@ -5,14 +5,14 @@ import pymorphy2
 
 args_len = len(sys.argv)
 if (args_len == 1):
-    print('autoabstract.py <text file name> <compression percent (default: 20)> <output file name (default: autoabstract.txt)>')
+    print('autoabstract.py <text file name> <compression (default: 20)> <output file name (default: autoabstract.txt)>')
     exit()
 if (args_len >= 2):
     TEXT_FILE_NAME = sys.argv[1]
-    PERCENT = 20
+    COMPRESSION_PERCENT = 20
     OUT_FILE_NAME = 'autoabstract.txt'
 if (args_len >= 3):
-    PERCENT = int(sys.argv[2])
+    COMPRESSION_PERCENT = int(sys.argv[2])
 if (args_len == 4):
     OUT_FILE_NAME = sys.argv[3]   
  
@@ -73,10 +73,10 @@ class Text:
         return open(NON_INFORMATIVE_WORDS_FILE_NAME, 'r').read().split(' ')
 
     # получить автореферат текста как "ужатый" до некоторого процента текст 
-    def summarize(self, percent):
+    def summarize(self, COMPRESSION_PERCENT):
         sw = [[s, s.get_weight(self)] for s in self.sentences] # sentences with weigth = sw
         sw = sorted(sw, key=lambda s: s[1], reverse=True) # отсортировать предложения по их весу по убыванию
-        max_sentences = self.size_s * percent // 100 # максимальное количество предложений в реферате
+        max_sentences = self.size_s * COMPRESSION_PERCENT // 100 # максимальное количество предложений в реферате
         min_weight = sw[max_sentences][1] # минимальный допустимый вес предложения в реферате
         abstract = ""
         for s in self.sentences: abstract += s.data + '.' if s.get_weight(self) >= min_weight else ''
@@ -86,5 +86,5 @@ class Text:
 
 text = Text(open(TEXT_FILE_NAME, 'r').read())
 out = open(OUT_FILE_NAME, 'w')
-out.write(text.summarize(PERCENT))
+out.write(text.summarize(COMPRESSION_PERCENT))
 out.close()
