@@ -1,6 +1,7 @@
 import sys
 import collections
 import functools
+import pymorphy2
 
 args_len = len(sys.argv)
 if (args_len == 1):
@@ -15,12 +16,13 @@ TEXT_FILE_NAME = sys.argv[1]
 PERCENT = 20
 END_SENTENCE_MARKS = ['.', '?', '!']
 PUNCTUATION_MARKS = [',', ';', '"', ':', '—', '\n', '«', '»'] + END_SENTENCE_MARKS
+MORPH = pymorphy2.MorphAnalyzer()
 
 class Word:
     def __init__(self, string):
         s = string.lower()
         for mark in PUNCTUATION_MARKS: s = s.replace(mark, '')
-        self.data = s # TODO слово нужно лемматизировать
+        self.data = MORPH.parse(s)[0].normal_form # TODO слово нужно лемматизировать
     
     # получить список синонимов слова
     def get_synonyms(self):
@@ -69,12 +71,12 @@ class Text:
 
     # получить автореферат текста как "ужатый" до некоторого процента текст 
     def summarize(self, percent):
-        sw = [[s, s.get_weight(text)] for s in text.sentences] # sentences with weigth = sw
+        sw = [[s, s.get_weight(self)] for s in self.sentences] # sentences with weigth = sw
         sw = sorted(sw, key=lambda s: s[1], reverse=True) # отсортировать предложения по их весу по убыванию
         max_sentences = self.size_s * percent // 100 # максимальное количество предложений в реферате
         min_weight = sw[max_sentences][1] # минимальный допустимый вес предложения в реферате
         abstract = ""
-        for s in text.sentences: abstract += s.data + '.' if s.get_weight(text) >= min_weight else ''
+        for s in self.sentences: abstract += s.data + '.' if s.get_weight(self) >= min_weight else ''
         return abstract
 
     def __str__(self): return self.data
