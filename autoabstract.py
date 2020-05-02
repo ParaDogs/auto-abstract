@@ -20,7 +20,7 @@ if (args_len == 4):
     OUT_FILE_NAME = sys.argv[3]   
  
 NON_INFORMATIVE_WORDS_FILE_NAME = "trash-words.txt"
-END_SENTENCE_MARKS = ['.', '?', '!']
+END_SENTENCE_MARKS = ['...', '.', '?', '!']
 PUNCTUATION_MARKS = [',', ';', '"', ':', '—', '\n', '«', '»'] + END_SENTENCE_MARKS
 MORPH = pymorphy2.MorphAnalyzer()
 
@@ -29,10 +29,6 @@ class Word:
         s = string.lower()
         for mark in PUNCTUATION_MARKS: s = s.replace(mark, '')
         self.data = MORPH.parse(s)[0].normal_form
-    
-    # получить список синонимов слова
-    def get_synonyms(self):
-        return [Word(self.data)] #TODO нужна сторонняя библиотека
 
     # получить вес слова в тексте
     def get_weight(self, text):
@@ -43,7 +39,8 @@ class Word:
 class Sentence:
     def __init__(self, string):
         self.data = string
-        chains = list(map(lambda w: Word(w), self.tokenize())) # преобразовать цепочки в слова
+        tokens = self.tokenize()
+        chains = list(map(lambda w: Word(w), tokens)) # преобразовать цепочки в слова
         self.words = [w for w in chains if w.data] # удалить пустые слова
         self.size = len(self.words)
 
@@ -69,7 +66,10 @@ class Text:
         
     # разбить текст на предложения
     def tokenize(self):
-        return self.data.split('.') #TODO учесть сокращения
+        text = ""
+        TEMP_MARK = '$$$'
+        for mark in END_SENTENCE_MARKS: text = self.data.replace(mark, mark+TEMP_MARK)
+        return text.split(TEMP_MARK)
 
     # получить неинформативные слова языка
     def get_trash_words(self):
@@ -82,7 +82,7 @@ class Text:
         max_sentences = self.size_s * COMPRESSION_PERCENT // 100 # максимальное количество предложений в реферате
         min_weight = sw[max_sentences][1] # минимальный допустимый вес предложения в реферате
         abstract = ""
-        for s in self.sentences: abstract += s.data + '.' if s.get_weight(self) >= min_weight else ''
+        for s in self.sentences: abstract += s.data if s.get_weight(self) >= min_weight else ''
         return abstract
 
     def __str__(self): return self.data
